@@ -10,10 +10,10 @@ const routes = {
 export function middleware(request: NextRequest) {
   const nextCookies = request.cookies;
   const nextPathname = request.nextUrl.pathname;
-  const isAuthenticated = Boolean(nextCookies.get(COOKIE_AUTH_TOKEN));
+  const authorizationToken = nextCookies.get(COOKIE_AUTH_TOKEN);
   const isRootPath = nextPathname === '/'
 
-  if (isAuthenticated) {
+  if (!!authorizationToken?.value) {
     if (routes.guest.includes(nextPathname) || isRootPath) {
       return NextResponse.redirect(new URL('/home', request.url));
     }
