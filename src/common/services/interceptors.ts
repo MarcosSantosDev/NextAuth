@@ -63,6 +63,8 @@ export const responseError = (error: AxiosError<InterceptorResponseError>) => {
           .catch((error) => {
             failedRequestsQueue.forEach(request => request.onFailure(error));
             failedRequestsQueue = [];
+
+            signOut();
           })
           .finally(() => {
             isRefreshing = false;

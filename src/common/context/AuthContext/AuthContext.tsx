@@ -15,9 +15,11 @@ import { AuthProviderProps, AuthContextData } from "./types";
 const AuthContext = React.createContext({} as AuthContextData);
 
 export const signOut = () => {
-  destroyAuthenticationTokens();
-
-  Router.push("/signIn");
+  if (!(typeof window === 'undefined')) {         
+    destroyAuthenticationTokens();
+  
+    Router.push("/signIn");
+  }
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
