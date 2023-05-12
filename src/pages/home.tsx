@@ -1,6 +1,7 @@
 import Head from "next/head";
 
 import { useAuthContext } from "@/common/context";
+import Can from "@/common/components/Can";
 
 export default function Home() {
   const authContext = useAuthContext();
@@ -14,8 +15,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h2>Home Page</h2>
-        <h4>User: {authContext?.user?.email}</h4>
+        <h2>User: {authContext?.user?.email}</h2>
+        
+        <Can permissions={['metrics.list']}>
+          <strong>Metricas</strong>
+        </Can>
       </main>
     </>
   );
