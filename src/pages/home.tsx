@@ -1,7 +1,9 @@
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 
 import { useAuthContext } from "@/common/context";
 import Can from "@/common/components/Can";
+import { serverHttp } from "@/common/services/http";
 
 export default function Home() {
   const authContext = useAuthContext();
@@ -23,4 +25,15 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const http = serverHttp(context);
+  const response = await http.get('me');
+
+  console.log('Response http', response.data);
+
+  return {
+    props: {}
+  }
 }

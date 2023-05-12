@@ -5,32 +5,30 @@ import * as authServices from "@/common/services/requests/auth";
 import * as userServices from "@/common/services/requests/user";
 import { SignInCredentials } from "@/common/types/auth";
 import { UserData } from "@/common/types/user";
-import {
-  getAuthenticationToken,
-  setAuthenticationTokens,
-  destroyAuthenticationTokens,
-} from "@/common/utils/auth";
+import AuthenticationTokens from "@/common/utils/AuthenticationTokens";
 import { AuthProviderProps, AuthContextData } from "./types";
 
 const AuthContext = React.createContext({} as AuthContextData);
 
-export const signOut = () => {
-  if (!(typeof window === 'undefined')) {         
-    destroyAuthenticationTokens();
+export const signOut = () => {        
+  const authenticationTokens = new AuthenticationTokens();
   
-    Router.push("/signIn");
-  }
+  authenticationTokens.destroyAuthenticationTokens();
+
+  Router.push("/signIn");
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
   const [user, setUser] = React.useState<UserData>();
+  
+  const authenticationTokens = new AuthenticationTokens();
 
   const signIn = async (credentials: SignInCredentials) => {
     try {
       const { token, refreshToken } = await authServices.signIn(credentials);
 
-      setAuthenticationTokens({ token, refreshToken });
+      authenticationTokens.setAuthenticationTokens({ token, refreshToken });
 
       router.push("/home");
     } catch (error) {
@@ -39,9 +37,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   React.useEffect(() => {
-    const authToken = getAuthenticationToken();
+    const token = authenticationTokens.getToken();
 
-    if (authToken) {
+    if (token) {
       userServices.getUser().then((data) => {
         const { email, permissions, roles } = data;
 

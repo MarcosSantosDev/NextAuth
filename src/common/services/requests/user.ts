@@ -1,4 +1,4 @@
-import clientHttp from '../clientHttp';
+import { clientHttp } from '../http';
 
 import { UserData } from "@/common/types/user";
 

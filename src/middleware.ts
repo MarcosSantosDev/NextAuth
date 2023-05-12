@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
     if (routes.guest.includes(nextPathname) || isRootPath) {
       return NextResponse.redirect(new URL('/home', request.url));
     }
-  } else if (routes.private.includes(nextPathname)) {
+  } else if (routes.private.includes(nextPathname) || isRootPath) {
     return NextResponse.redirect(new URL('/signIn', request.url));
   }
 

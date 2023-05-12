@@ -1,35 +1,18 @@
-import {
+import { GetServerSidePropsContext } from 'next';
+import type {
   InternalAxiosRequestConfig,
   AxiosResponse,
-  AxiosError
+  AxiosError,
+  AxiosInstance
 } from 'axios';
 
-import {
-  getAuthenticationRefreshToken,
-  getAuthenticationToken,
-  setAuthenticationTokens,
-} from '@/common/utils/auth';
+import AuthenticationTokens from '@/common/utils/AuthenticationTokens';
 import { signOut } from '@/common/context';
-import clientHttp from './clientHttp';
-import { authRefreshToken } from './requests/auth';
 import { InterceptorResponseError  } from './types';
 
-export const requestSuccess = (config: InternalAxiosRequestConfig) => {
-  const authenticationToken = getAuthenticationToken();
-
-  if (authenticationToken) {
-    config.headers.Authorization = `Bearer ${authenticationToken}`;
-  }
-
-  return config;
-}
-
-export const requestError = (error: AxiosError) => {
-  return error;
-}
-
-export const responseSuccess = (response: AxiosResponse) => {
-  return response;
+type AxiosInterceptorConfig = {
+  axiosInstance: AxiosInstance;
+  context?: GetServerSidePropsContext | null;
 }
 
 type FailedRequestsQueue = {
@@ -40,53 +23,80 @@ type FailedRequestsQueue = {
 let failedRequestsQueue: FailedRequestsQueue[] = [];
 let isRefreshing = false;
 
-export const responseError = (error: AxiosError<InterceptorResponseError>) => {
-  const originalConfig = error.config;
+export const applyAxiosInterceptors = ({
+  axiosInstance,
+  context = null
+}: AxiosInterceptorConfig) => {
+  const authenticationTokens = new AuthenticationTokens(context);
 
-  if (error.response && error.response.status === 401) {
-    const refreshToken = getAuthenticationRefreshToken();
+  axiosInstance.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+      if (authenticationTokens.getToken()) {
+        config.headers.Authorization = `Bearer ${authenticationTokens.getToken()}`;
+      }
+    
+      return config;
+    },
+    (error: AxiosError) => error
+  );
 
-    if (error.response.data?.code === 'token.expired' && refreshToken) {
-      if (!isRefreshing) {
-        isRefreshing = true;
+  axiosInstance.interceptors.response.use(
+    (response: AxiosResponse) => response,
+    (error: AxiosError<InterceptorResponseError>) => {
+      const originalConfig = error.config;
 
-        authRefreshToken(refreshToken)
-          .then((response) => {
-            setAuthenticationTokens({
-              token: response.token,
-              refreshToken: response.refreshToken,
-            });
+      if (error.response && error.response.status === 401) {
+        const refreshToken = authenticationTokens.getRefreshToken();
 
-            failedRequestsQueue.forEach(request => request.onSuccess());
-            failedRequestsQueue = [];
+        if (error.response.data?.code === 'token.expired' && refreshToken) {
+          if (!isRefreshing) {
+            isRefreshing = true;
+
+            axiosInstance.post('refresh', { refreshToken })
+              .then((response) => {
+                authenticationTokens.setAuthenticationTokens({
+                  token: response.data.token,
+                  refreshToken: response.data.refreshToken,
+                });
+
+                failedRequestsQueue.forEach(request => request.onSuccess());
+                failedRequestsQueue = [];
+              })
+              .catch((error) => {
+                failedRequestsQueue.forEach(request => request.onFailure(error));
+                failedRequestsQueue = [];
+
+                if (typeof window !== 'undefined') {
+                  signOut();
+                }
+              })
+              .finally(() => {
+                isRefreshing = false;
+              });
+          }
+
+          return new Promise((resolve, reject) => {
+            failedRequestsQueue.push({
+              onSuccess: () => {
+                if (originalConfig) {
+                  resolve(axiosInstance(originalConfig));
+                }
+              },
+              onFailure: (error: AxiosError<InterceptorResponseError>) => {
+                reject(error);
+              },
+            })
           })
-          .catch((error) => {
-            failedRequestsQueue.forEach(request => request.onFailure(error));
-            failedRequestsQueue = [];
-
+        } else {
+          if (typeof window !== 'undefined') {
             signOut();
-          })
-          .finally(() => {
-            isRefreshing = false;
-          });
+          }
+        }
       }
 
-      return new Promise((resolve, reject) => {
-        failedRequestsQueue.push({
-          onSuccess: () => {
-            if (originalConfig) {
-              resolve(clientHttp(originalConfig));
-            }
-          },
-          onFailure: (error: AxiosError<InterceptorResponseError>) => {
-            reject(error);
-          },
-        })
-      })
-    } else {
-      signOut();
+      return Promise.reject(error);
     }
-  }
+  );
 
-  return Promise.reject(error);
+  return axiosInstance;
 }
