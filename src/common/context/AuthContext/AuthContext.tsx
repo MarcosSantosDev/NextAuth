@@ -1,8 +1,7 @@
 import * as React from "react";
 import Router, { useRouter } from "next/router";
 
-import * as authServices from "@/common/services/requests/auth";
-import * as userServices from "@/common/services/requests/user";
+import * as services from "@/common/services/requests";
 import { SignInCredentials } from "@/common/types/auth";
 import { UserData } from "@/common/types/user";
 import AuthenticationTokens from "@/common/utils/AuthenticationTokens";
@@ -23,10 +22,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = React.useState<UserData>();
   
   const authenticationTokens = new AuthenticationTokens();
+  const token = authenticationTokens.getToken();
 
   const signIn = async (credentials: SignInCredentials) => {
     try {
-      const { token, refreshToken } = await authServices.signIn(credentials);
+      const { token, refreshToken } = await services.signIn(credentials);
 
       authenticationTokens.setAuthenticationTokens({ token, refreshToken });
 
@@ -37,10 +37,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   React.useEffect(() => {
-    const token = authenticationTokens.getToken();
-
     if (token) {
-      userServices.getUser().then((data) => {
+      services.getUser().then((data) => {
         const { email, permissions, roles } = data;
 
         setUser({ email, permissions, roles });
@@ -49,7 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         signOut();
       });
     }
-  }, [router.pathname]);
+  }, [router.pathname, token]);
 
   return (
     <AuthContext.Provider

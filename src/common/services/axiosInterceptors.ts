@@ -9,6 +9,7 @@ import type {
 import AuthenticationTokens from '@/common/utils/AuthenticationTokens';
 import { signOut } from '@/common/context';
 import { InterceptorResponseError  } from './types';
+import { AuthTokenError } from './errors/AuthTokenError';
 
 type AxiosInterceptorConfig = {
   axiosInstance: AxiosInstance;
@@ -90,6 +91,8 @@ export const applyAxiosInterceptors = ({
         } else {
           if (typeof window !== 'undefined') {
             signOut();
+          } else {
+            return Promise.reject(new AuthTokenError())
           }
         }
       }
@@ -100,3 +103,4 @@ export const applyAxiosInterceptors = ({
 
   return axiosInstance;
 }
+
