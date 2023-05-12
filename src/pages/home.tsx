@@ -1,13 +1,16 @@
-import { GetServerSideProps } from "next";
+import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 
-import { useAuthContext } from "@/common/context";
 import Can from "@/common/components/Can";
 import { serverHttp } from "@/common/services/http";
+import { withSSRAuth } from "@/common/utils/withSSRAuth";
+import type { UserData } from "@/common/types/user";
 
-export default function Home() {
-  const authContext = useAuthContext();
+type HomeProps = {
+  user: UserData;
+};
 
+export default function Home({ user }: HomeProps) {
   return (
     <>
       <Head>
@@ -17,9 +20,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h2>User: {authContext?.user?.email}</h2>
-        
-        <Can permissions={['metrics.list']}>
+        <h2>User: {user.email}</h2>
+
+        <Can permissions={["metrics.list"]}>
           <strong>Metricas</strong>
         </Can>
       </main>
@@ -27,13 +30,16 @@ export default function Home() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps = withSSRAuth<HomeProps>(async (
+  context: GetServerSidePropsContext
+) => {
   const http = serverHttp(context);
-  const response = await http.get('me');
 
-  console.log('Response http', response.data);
+  const response = await http.get<UserData>("me");
 
   return {
-    props: {}
-  }
-}
+    props: {
+      user: response.data,
+    },
+  };
+});
