@@ -6,7 +6,7 @@
 
 # Authentication flow with JWT
 
-> Authentication flow:
+> Authentication flow on client/server side:
 > - SignIn
 > - SignOut
 > - RefreshToken
