@@ -22,7 +22,7 @@
     "typescript": "5.0.4"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": "please-use-npm"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
