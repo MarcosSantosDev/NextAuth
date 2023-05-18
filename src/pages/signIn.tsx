@@ -18,11 +18,12 @@ const SignIn = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const data = new FormData(event.currentTarget);
 
-    await authContext?.signIn({
-      email: "diego@rocketseat.team",
-      password: "123456",
-    });
+    const email = data.get('email')! as string;
+    const password = data.get('password')! as string;
+
+    await authContext?.signIn({ email, password });
   };
 
   return (
@@ -42,15 +43,17 @@ const SignIn = () => {
               id="email"
               value={email}
               onChange={handleEmailChange}
+              required
             />
           </div>
           <div>
             <label htmlFor="password">Senha:</label>
             <input
-              type="password"
               id="password"
+              type="password"
               value={password}
               onChange={handlePasswordChange}
+              required
             />
           </div>
           <button type="submit">Entrar</button>
