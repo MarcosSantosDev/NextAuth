@@ -4,7 +4,7 @@ import { COOKIE_AUTH_TOKEN } from './common/constants/storage';
 
 const routes = {
   guest: ['/signIn'],
-  private: ['/home']
+  private: ['/home', '/metrics']
 }
 
 export function middleware(request: NextRequest) {

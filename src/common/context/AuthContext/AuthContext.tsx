@@ -9,9 +9,9 @@ import { AuthProviderProps, AuthContextData } from "./types";
 
 const AuthContext = React.createContext({} as AuthContextData);
 
-export const signOut = () => {        
+export const signOut = () => {
   const authenticationTokens = new AuthenticationTokens();
-  
+
   authenticationTokens.destroyAuthenticationTokens();
 
   Router.push("/signIn");
@@ -19,8 +19,8 @@ export const signOut = () => {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const router = useRouter();
-  const [user, setUser] = React.useState<UserData>();
-  
+  const [user, setUser] = React.useState<UserData | null>(null);
+
   const authenticationTokens = new AuthenticationTokens();
   const token = authenticationTokens.getToken();
 
@@ -36,24 +36,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const handleSignOut = React.useCallback(() => {
+    setUser(null);
+    signOut();
+  }, []);
+
   React.useEffect(() => {
     if (token) {
-      services.getUser().then((data) => {
-        const { email, permissions, roles } = data;
+      services
+        .getUser()
+        .then((data) => {
+          const { email, permissions, roles } = data;
 
-        setUser({ email, permissions, roles });
-      })
-      .catch(() => {
-        signOut();
-      });
+          setUser({ email, permissions, roles });
+        })
+        .catch(() => {
+          handleSignOut();
+        });
     }
-  }, [router.pathname, token]);
+  }, [router.pathname, handleSignOut, token]);
 
   return (
     <AuthContext.Provider
       value={{
-        signIn,
         user,
+        signIn,
+        signOut: handleSignOut,
         isAuthenticated: !!user,
       }}
     >

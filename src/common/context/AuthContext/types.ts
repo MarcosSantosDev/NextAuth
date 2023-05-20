@@ -3,8 +3,9 @@ import { UserData } from "@/common/types/user";
 
 export type AuthContextData = {
   signIn(credentials: SignInCredentials): Promise<void>;
+  signOut(): void;
   isAuthenticated: boolean;
-  user?: UserData;
+  user?: UserData | null;
 };
 
 
