@@ -13,8 +13,9 @@ const Header = () => {
         </h4>
 
         <div className="flex justify-end items-center gap-10">
-          <nav className="">
+          <nav className="flex gap-4">
             <Link href='/metrics' className="font-bold underline">Metrics</Link>
+            <Link href='/users' className="font-bold underline">Users</Link>
           </nav>
 
           <div className="flex justify-end items-center gap-2">

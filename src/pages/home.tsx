@@ -1,10 +1,11 @@
 import type { GetServerSidePropsContext } from "next";
-import Head from "next/head";
+import type { ReactElement } from 'react';
 
 import Can from "@/common/components/Can";
 import { serverHttp } from "@/common/services/http";
 import { withSSRAuth } from "@/common/utils/withSSRAuth";
 import type { UserData } from "@/common/types/user";
+import { AuthenticatedLayout } from "@/common/templates";
 
 type HomeProps = {
   user: UserData;
@@ -12,7 +13,7 @@ type HomeProps = {
 
 export default function Home({ user }: HomeProps) {
   return (
-    <div className="w-full h-screen flex justify-center items-center">
+    <main className="w-full h-screen flex justify-center items-center">
       <div className="grid justify-center content-center gap-4 text-center">
         <h2 className="text-lg font-normal font-pressStart2P">
           Welcome to home page
@@ -39,8 +40,16 @@ export default function Home({ user }: HomeProps) {
           </Can>
         </div>
       </div>
-    </div>
+    </main>
   );
+}
+
+Home.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <AuthenticatedLayout>
+      {page}
+    </AuthenticatedLayout>
+  )
 }
 
 export const getServerSideProps = withSSRAuth<HomeProps>(

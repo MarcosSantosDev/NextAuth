@@ -1,11 +1,10 @@
-import type { AppProps } from "next/app";
-import { Inter, Press_Start_2P } from "next/font/google";
+import type { ReactElement, ReactNode } from 'react';
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
 import Head from "next/head";
+import { Inter, Press_Start_2P } from "next/font/google";
 
 import "@/common/styles/globals.css";
-import { AuthProvider } from "@/common/context";
-import Header from "@/common/components/Header";
-import { Container, Main } from "@/common/templates";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,7 +17,17 @@ const pressStart2P = Press_Start_2P({
   display: "swap",
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+ 
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout || ((page) => page);
+
   return (
     <>
       <Head>
@@ -35,15 +44,7 @@ export default function App({ Component, pageProps }: AppProps) {
           }
         `}
       </style>
-      <Container>
-        <AuthProvider>
-          <Header />
-
-          <Main>
-            <Component {...pageProps} />
-          </Main>
-        </AuthProvider>
-      </Container>
+      {getLayout(<Component {...pageProps} />)}
     </>
   );
 }

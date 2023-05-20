@@ -1,2 +1,2 @@
-export { default as Container } from './Container'
-export { default as Main } from './Main'
+export { default as PublicLayout } from './PublicLayout'
+export { default as AuthenticatedLayout } from './AuthenticatedLayout'

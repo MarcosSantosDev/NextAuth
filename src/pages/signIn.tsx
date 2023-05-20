@@ -1,6 +1,8 @@
-import Head from "next/head";
 import * as React from "react";
+import type { ReactElement } from "react";
+
 import { useAuthContext } from "@/common/context";
+import { PublicLayout } from "@/common/templates";
 
 const SignIn = () => {
   const authContext = useAuthContext();
@@ -67,5 +69,13 @@ const SignIn = () => {
     </div>
   );
 };
+
+SignIn.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <PublicLayout>
+      {page}
+    </PublicLayout>
+  )
+}
 
 export default SignIn;
