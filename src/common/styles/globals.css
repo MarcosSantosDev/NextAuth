@@ -5,9 +5,4 @@
 html,
 body {
   font-family: var(--font-inter);
-  background: linear-gradient(
-    to right,
-    rgba(34, 193, 195, 1),
-    rgba(0, 0, 0, 0)
-  );
 }

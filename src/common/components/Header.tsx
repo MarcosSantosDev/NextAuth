@@ -7,8 +7,8 @@ const Header = () => {
 
   if (authContext && authContext.isAuthenticated) {
     return (
-      <header className="max-w-full w-screen h-20 px-4 flex justify-between items-center border-b-2 border-b-blue-200">
-        <h4 className="text-sm whitespace-nowrap font-normal font-pressStart2P">
+      <header className="h-20 px-4 flex justify-between items-center border-b-2 border-b-green-100">
+        <h4 className="text-sm font-normal font-pressStart2P">
           Next.js Authentication
         </h4>
 
