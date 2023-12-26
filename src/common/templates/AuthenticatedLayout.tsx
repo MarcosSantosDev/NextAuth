@@ -1,15 +1,14 @@
 import * as React from "react";
+
 import Header from "@/common/components/Header";
 
-import PublicLayout from "./PublicLayout";
-
-const Layout = ({ children }: React.PropsWithChildren<unknown>) => {
+const AuthenticatedLayout = ({ children }: React.PropsWithChildren<unknown>) => {
   return (
-    <PublicLayout>
-      <Header />
-      {children}
-    </PublicLayout>
+      <main className="max-h-screen overflow-y-scroll">
+        <Header />
+        {children}
+      </main>
   );
 };
 
-export default Layout;
+export default AuthenticatedLayout;

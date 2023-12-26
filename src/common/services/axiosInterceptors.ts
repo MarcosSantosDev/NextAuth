@@ -1,20 +1,13 @@
-import { GetServerSidePropsContext } from 'next';
-import type {
+import axios, {
   InternalAxiosRequestConfig,
   AxiosResponse,
-  AxiosError,
-  AxiosInstance
+  AxiosError
 } from 'axios';
 
 import AuthenticationTokens from '@/common/utils/AuthenticationTokens';
 import { signOut } from '@/common/context';
-import { InterceptorResponseError  } from './types';
-import { AuthTokenError } from './errors/AuthTokenError';
-
-type AxiosInterceptorConfig = {
-  axiosInstance: AxiosInstance;
-  context?: GetServerSidePropsContext | null;
-}
+import axiosDefaults from './axiosDefaults';
+import { InterceptorResponseError } from './types';
 
 type FailedRequestsQueue = {
   onSuccess: () => void;
@@ -24,18 +17,17 @@ type FailedRequestsQueue = {
 let failedRequestsQueue: FailedRequestsQueue[] = [];
 let isRefreshing = false;
 
-export const applyAxiosInterceptors = ({
-  axiosInstance,
-  context = null
-}: AxiosInterceptorConfig) => {
-  const authenticationTokens = new AuthenticationTokens(context);
+export const applyAxiosInterceptors = () => {
+  const axiosInstance = axios.create(axiosDefaults);
+
+  const authenticationTokens = new AuthenticationTokens();
 
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       if (authenticationTokens.getToken()) {
         config.headers.Authorization = `Bearer ${authenticationTokens.getToken()}`;
       }
-    
+
       return config;
     },
     (error: AxiosError) => error
@@ -67,9 +59,7 @@ export const applyAxiosInterceptors = ({
                 failedRequestsQueue.forEach(request => request.onFailure(error));
                 failedRequestsQueue = [];
 
-                if (typeof window !== 'undefined') {
-                  signOut();
-                }
+                signOut();
               })
               .finally(() => {
                 isRefreshing = false;
@@ -89,11 +79,7 @@ export const applyAxiosInterceptors = ({
             })
           })
         } else {
-          if (typeof window !== 'undefined') {
-            signOut();
-          } else {
-            return Promise.reject(new AuthTokenError())
-          }
+          signOut();
         }
       }
 

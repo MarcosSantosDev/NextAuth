@@ -36,33 +36,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const handleSignOut = React.useCallback(() => {
-    setUser(null);
-    signOut();
-  }, []);
-
   React.useEffect(() => {
     if (token) {
       services
         .getUser()
         .then((data) => {
           const { email, permissions, roles } = data;
-
           setUser({ email, permissions, roles });
         })
         .catch(() => {
-          handleSignOut();
+          setUser(null);
+          signOut();
         });
     }
-  }, [router.pathname, handleSignOut, token]);
+  }, [router.pathname, setUser, token]);
 
   return (
     <AuthContext.Provider
       value={{
-        user,
         signIn,
-        signOut: handleSignOut,
+        signOut,
         isAuthenticated: !!user,
+        user,
       }}
     >
       {children}

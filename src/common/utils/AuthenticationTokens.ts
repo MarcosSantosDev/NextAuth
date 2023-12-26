@@ -1,8 +1,7 @@
 import { GetServerSidePropsContext } from 'next';
-
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 
-import { COOKIE_AUTH_TOKEN, COOKIE_AUTH_REFRESHTOKEN } from '@/common/constants/storage';
+import { COOKIE_AUTH_TOKEN, COOKIE_AUTH_REFRESHTOKEN, COOKIE_AUTH_MAX_AGE } from '@/common/constants/storage';
 
 type Tokens = {
   token: string;
@@ -10,32 +9,37 @@ type Tokens = {
 }
 
 class AuthenticationTokens {
-  private context: GetServerSidePropsContext | null;
+  private context?: GetServerSidePropsContext;
 
-  constructor(context: GetServerSidePropsContext | null = null) {
-    this.context = context;    
+  constructor(context?: GetServerSidePropsContext) {
+    this.context = context;
+  }
+
+  public getCookies() {
+    const cookies = parseCookies(this.context);
+    return cookies
   }
 
   public getToken() {
-    const cookies = parseCookies(this.context);
-    const authToken = cookies[COOKIE_AUTH_TOKEN];
+    const cookies = this.getCookies();
+    const authToken = cookies?.[COOKIE_AUTH_TOKEN];
     return authToken;
   }
 
   public getRefreshToken() {
-    const cookies = parseCookies(this.context);
-    const authToken = cookies[COOKIE_AUTH_REFRESHTOKEN];
+    const cookies = this.getCookies();
+    const authToken = cookies?.[COOKIE_AUTH_REFRESHTOKEN];
     return authToken;
   }
 
   public setAuthenticationTokens(tokens: Tokens) {
     setCookie(this.context, COOKIE_AUTH_TOKEN, tokens.token, {
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: '/'
+      path: '/',
+      maxAge: COOKIE_AUTH_MAX_AGE,
     });
     setCookie(this.context, COOKIE_AUTH_REFRESHTOKEN, tokens.refreshToken, {
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: '/'
+      path: '/',
+      maxAge: COOKIE_AUTH_MAX_AGE,
     });
   }
 

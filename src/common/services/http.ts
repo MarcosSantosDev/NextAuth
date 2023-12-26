@@ -1,10 +1,5 @@
-import { GetServerSidePropsContext } from 'next';
-
-import axiosInstance from './axiosInstance';
 import { applyAxiosInterceptors } from './axiosInterceptors';
+import { applyAxiosInterceptorsSSR } from './axiosInterceptorsSSR';
 
-export const serverHttp = (context: GetServerSidePropsContext) => {
-  return applyAxiosInterceptors({ axiosInstance, context });
-}
-
-export const clientHttp = applyAxiosInterceptors({ axiosInstance });
+export const setupClientHttp = applyAxiosInterceptors();
+export const setupSSRHttp = applyAxiosInterceptorsSSR;

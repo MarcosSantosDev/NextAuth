@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 
 import { AuthenticatedLayout } from "@/common/templates";
 import Can from "@/common/components/Can";
+import { withSSRAuth } from "@/common/utils/withSSRAuth";
 
 export default function Metrics() {
   return (
@@ -29,3 +30,12 @@ Metrics.getLayout = function getLayout(page: ReactElement) {
     </AuthenticatedLayout>
   )
 }
+
+export const getServerSideProps = withSSRAuth(async () => {
+  return {
+    props: {}
+  }
+}, {
+  permissions: ['metrics.list'],
+  roles: ['administrator']
+})

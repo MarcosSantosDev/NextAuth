@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactElement } from "react";
 
+import { withSSRAuth } from "@/common/utils/withSSRAuth";
 import { AuthenticatedLayout } from "@/common/templates";
 import Can from "@/common/components/Can";
 
@@ -29,3 +30,12 @@ Users.getLayout = function getLayout(page: ReactElement) {
     </AuthenticatedLayout>
   )
 }
+
+export const getServerSideProps = withSSRAuth(async () => {
+  return {
+    props: {}
+  }
+}, {
+  permissions: ['users.list'],
+  roles: ['administrator']
+})

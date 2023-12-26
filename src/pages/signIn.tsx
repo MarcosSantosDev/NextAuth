@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 
 import { useAuthContext } from "@/common/context";
 import { PublicLayout } from "@/common/templates";
+import { withSSRGuest } from "@/common/utils/withSSRGuest";
 
 const SignIn = () => {
   const authContext = useAuthContext();
@@ -25,7 +26,10 @@ const SignIn = () => {
     const email = data.get("email")! as string;
     const password = data.get("password")! as string;
 
-    await authContext?.signIn({ email, password });
+    await authContext?.signIn({
+      email: 'admin@mail.com',
+      password: '123456'
+    });
   };
 
   return (
@@ -45,7 +49,7 @@ const SignIn = () => {
             placeholder="E-mail"
             value={email}
             onChange={handleEmailChange}
-            required
+            // required
           />
 
           <input
@@ -56,7 +60,7 @@ const SignIn = () => {
             placeholder="Password"
             value={password}
             onChange={handlePasswordChange}
-            required
+            // required
           />
           <button
             type="submit"
@@ -77,5 +81,11 @@ SignIn.getLayout = function getLayout(page: ReactElement) {
     </PublicLayout>
   )
 }
+
+export const getServerSideProps = withSSRGuest(async () => {
+  return {
+    props: {}
+  }
+})
 
 export default SignIn;

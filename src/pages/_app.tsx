@@ -1,8 +1,9 @@
-import type { ReactElement, ReactNode } from 'react';
-import type { NextPage } from 'next';
-import type { AppProps } from 'next/app';
+import type { ReactElement, ReactNode } from "react";
+import type { NextPage } from "next";
+import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Inter, Press_Start_2P } from "next/font/google";
+import { AuthProvider } from "@/common/context";
 
 import "@/common/styles/globals.css";
 
@@ -17,10 +18,14 @@ const pressStart2P = Press_Start_2P({
   display: "swap",
 });
 
+function AppProvider({ children }: React.PropsWithChildren) {
+  return <AuthProvider>{children}</AuthProvider>;
+}
+
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
- 
+
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
@@ -44,7 +49,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           }
         `}
       </style>
-      {getLayout(<Component {...pageProps} />)}
+      <AppProvider>{getLayout(<Component {...pageProps} />)}</AppProvider>
     </>
   );
 }
