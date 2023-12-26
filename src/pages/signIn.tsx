@@ -3,7 +3,6 @@ import type { ReactElement } from "react";
 
 import { useAuthContext } from "@/common/context";
 import { PublicLayout } from "@/common/templates";
-import { withSSRGuest } from "@/common/utils/withSSRGuest";
 
 const SignIn = () => {
   const authContext = useAuthContext();
@@ -81,11 +80,5 @@ SignIn.getLayout = function getLayout(page: ReactElement) {
     </PublicLayout>
   )
 }
-
-export const getServerSideProps = withSSRGuest(async () => {
-  return {
-    props: {}
-  }
-})
 
 export default SignIn;

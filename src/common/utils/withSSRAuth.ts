@@ -6,29 +6,18 @@ import { AuthTokenError } from "@/common/services/errors";
 import AuthenticationTokens from "./AuthenticationTokens";
 import { validateUserPermissions } from "./validateUserPermissions";
 
-type WithSSRAuthOptions = {
+type WithUserPermissionsCheckerOptions = {
   permissions?: string[];
   roles?: string[];
 }
 
-export function withSSRAuth<P extends { [key: string]: any; }>(fn: GetServerSideProps<P>, options?: WithSSRAuthOptions) {
+export function withSSRAuth<P extends { [key: string]: any; }>(fn: GetServerSideProps<P>, options: WithUserPermissionsCheckerOptions) {
   return async (ctx: GetServerSidePropsContext): Promise<GetServerSidePropsResult<P>> => {
     const authenticationTokens = new AuthenticationTokens(ctx);
     
     const token = authenticationTokens.getToken();
 
-    if(!token) {
-      authenticationTokens.destroyAuthenticationTokens();
-
-      return {
-        redirect: {
-          destination: '/signIn',
-          permanent: false
-        }
-      }
-    }
-
-    if (options) {
+    if (options && token) {
       const userJWTDecoded = jwtDecode<{ permissions: string[]; roles: string[]; }>(token)
   
       const userHasValidPermissions = validateUserPermissions({
