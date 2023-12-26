@@ -7,6 +7,9 @@ module.exports = {
       'pressStart2P': ['var(--font-pressStart2P)', 'Helvetica', 'Arial', 'sans-serif'],
     },
     extend: {
+      gridTemplateColumns: {
+        appWithSidebar: 'auto 1fr'
+      }
     },
   },
   plugins: [],
