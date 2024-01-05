@@ -14,10 +14,31 @@ export function middleware(request: NextRequest) {
   const nextPathname = request.nextUrl.pathname;
 
   const authorizationToken = nextCookies.get(COOKIE_AUTH_TOKEN)?.value;
+  const authorizationRefreshToken = nextCookies.get(COOKIE_AUTH_REFRESHTOKEN)?.value;
 
   const isRootPath = nextPathname === '/'
 
   const mountNewUrl = (urlToRedirect: string) => new URL(urlToRedirect, request.url)
+
+  if (!authorizationToken || !authorizationRefreshToken) {
+    if (isRootPath || routes.private.includes(nextPathname)) {
+      const response = NextResponse.redirect(mountNewUrl('/signIn'));
+      
+      if (!authorizationToken && !!authorizationRefreshToken) {
+        response.cookies.delete(COOKIE_AUTH_REFRESHTOKEN)
+      }
+      
+      if(!!authorizationToken && !authorizationRefreshToken) {
+        response.cookies.delete(COOKIE_AUTH_TOKEN)
+      }
+
+      return response;
+    }
+    
+    if (routes.guest.includes(nextPathname) || routes.guestNoAuth.includes(nextPathname)) {
+      return NextResponse.next();
+    }
+  }
 
   if (authorizationToken) {
     if (isRootPath || routes.guestNoAuth.includes(nextPathname)) {

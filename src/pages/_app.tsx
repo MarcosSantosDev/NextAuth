@@ -3,9 +3,10 @@ import type { NextPage } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Inter, Press_Start_2P } from "next/font/google";
-import { AuthProvider } from "@/common/context";
 
 import "@/common/styles/globals.css";
+import useStore from "@/common/store/zustand/useStore";
+import { useGlobalApp } from "@/common/store/zustand/useGlobalApp";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,10 +19,6 @@ const pressStart2P = Press_Start_2P({
   display: "swap",
 });
 
-function AppProvider({ children }: React.PropsWithChildren) {
-  return <AuthProvider>{children}</AuthProvider>;
-}
-
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
@@ -32,6 +29,10 @@ type AppPropsWithLayout = AppProps & {
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page) => page);
+  
+  const globalApp = useStore(useGlobalApp, (state) => state)
+
+  globalApp?.validatePersistedDataThatNeedsAuthentication();
 
   return (
     <>
@@ -49,7 +50,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           }
         `}
       </style>
-      <AppProvider>{getLayout(<Component {...pageProps} />)}</AppProvider>
+      {getLayout(<Component {...pageProps} />)}
     </>
   );
 }

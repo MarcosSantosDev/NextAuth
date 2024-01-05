@@ -1,11 +1,12 @@
+import Router from 'next/router'
 import axios, {
   InternalAxiosRequestConfig,
   AxiosResponse,
   AxiosError
 } from 'axios';
 
+import { useUserAuth } from '@/common/store/zustand/useUserAuth';
 import AuthenticationTokens from '@/common/utils/AuthenticationTokens';
-import { signOut } from '@/common/context';
 import axiosDefaults from './axiosDefaults';
 import { InterceptorResponseError } from './types';
 
@@ -59,7 +60,9 @@ export const applyAxiosInterceptors = () => {
                 failedRequestsQueue.forEach(request => request.onFailure(error));
                 failedRequestsQueue = [];
 
-                signOut();
+                if (typeof window !== 'undefined') {
+                  useUserAuth.getState().signOut()
+                }
               })
               .finally(() => {
                 isRefreshing = false;
@@ -79,7 +82,9 @@ export const applyAxiosInterceptors = () => {
             })
           })
         } else {
-          signOut();
+          if (typeof window !== 'undefined') {
+            useUserAuth.getState().signOut()
+          }
         }
       }
 
