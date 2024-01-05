@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { useEffect } from "react";
 
-import { useAuthContext } from "@/common/context";
+import useStore from "@/common/store/zustand/useStore";
+import { useUserAuth } from "@/common/store/zustand/useUserAuth";
 
 const Header = () => {
-  const authContext = useAuthContext();
+  const userAuth = useStore(useUserAuth, (state) => state);
 
-  if (authContext && authContext.isAuthenticated) {
+  if (userAuth?.isAuthenticated) {
     return (
       <header className="h-20 px-4 flex justify-between items-center border-b-2 border-b-green-100">
         <h4 className="text-sm font-normal font-pressStart2P">
@@ -19,14 +21,14 @@ const Header = () => {
           </nav>
 
           <div className="flex justify-end items-center gap-2">
-            <p className="text-black font-bold">{authContext.user?.email}</p>
+            <p className="text-black font-bold">{userAuth?.user?.email}</p>
 
             <div className="w-10 h-10 flex justify-center items-center bg-black rounded-full"/>
 
             <button
               type="button"
               className="w-fit h-10 px-4 py-1 text-gray-600 border-2 border-gray-600 rounded-md font-bold"
-              onClick={() => authContext.signOut()}
+              onClick={() => userAuth?.signOut()}
             >
               Signout
             </button>

@@ -1,11 +1,12 @@
 import * as React from "react";
 import type { ReactElement } from "react";
 
-import { useAuthContext } from "@/common/context";
+import { useUserAuth } from "@/common/store/zustand/useUserAuth";
+
 import { PublicLayout } from "@/common/templates";
 
 const SignIn = () => {
-  const authContext = useAuthContext();
+  const signIn = useUserAuth((state) => state.signIn);
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -25,7 +26,7 @@ const SignIn = () => {
     const email = data.get("email")! as string;
     const password = data.get("password")! as string;
 
-    await authContext?.signIn({
+    await signIn({
       email: 'admin@mail.com',
       password: '123456'
     });

@@ -1,4 +1,6 @@
-import { useAuthContext } from '@/common/context'
+import useStore from "@/common/store/zustand/useStore";
+import { useUserAuth } from "@/common/store/zustand/useUserAuth";
+
 import { validateUserPermissions } from '@/common/utils/validateUserPermissions';
 
 export type UseCanHookProps = {
@@ -7,16 +9,14 @@ export type UseCanHookProps = {
 }
 
 const useCan = ({ permissions = [], roles = [] }: UseCanHookProps) => {
-  const auth = useAuthContext();
+  const userAuth = useStore(useUserAuth, (state) => state);
 
-  if (!(auth?.isAuthenticated && auth?.user)) {
+  if (!userAuth?.isAuthenticated || userAuth?.user === null) {
     return false
   }
 
-  const { user } = auth;
-
   const userHasValidPermissions = validateUserPermissions({
-    user,
+    user: userAuth?.user,
     permissions,
     roles
   });
