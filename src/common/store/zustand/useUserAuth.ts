@@ -1,11 +1,13 @@
 import Router from "next/router";
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { AxiosError } from "axios";
 
 import * as services from "@/common/services/requests";
 import AuthenticationTokens from "@/common/utils/AuthenticationTokens";
 import { SignInCredentials } from "@/common/types/auth";
 import { UserData } from "@/common/types/user";
+import { useError } from "@/common/store/zustand/useError";
 
 import { STORAGE_NAME_USER } from "./contants";
 
@@ -42,7 +44,9 @@ export const useUserAuth = create(persist<UserAuthData>((set) => ({
 
       Router.push("/home");
     } catch (error) {
-      console.error(error);
+      if (error instanceof AxiosError) {
+        useError.getState().setError(error?.response?.data.message);
+      }
     }
   },
   signOut: () => {

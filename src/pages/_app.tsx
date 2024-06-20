@@ -5,6 +5,7 @@ import Head from "next/head";
 import { Inter, Press_Start_2P } from "next/font/google";
 
 import "@/common/styles/globals.css";
+import NotificationToast from "@/common/components/NotificationToast/NotificationToast";
 import useStore from "@/common/store/zustand/useStore";
 import { useGlobalApp } from "@/common/store/zustand/useGlobalApp";
 
@@ -50,7 +51,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
           }
         `}
       </style>
-      {getLayout(<Component {...pageProps} />)}
+      <NotificationToast>
+        {getLayout(<Component {...pageProps} />)}
+      </NotificationToast>
     </>
   );
 }

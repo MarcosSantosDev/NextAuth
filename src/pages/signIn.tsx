@@ -8,17 +8,6 @@ import { PublicLayout } from "@/common/templates";
 const SignIn = () => {
   const signIn = useUserAuth((state) => state.signIn);
 
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
-
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
-
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -28,7 +17,7 @@ const SignIn = () => {
 
     await signIn({
       email: 'admin@mail.com',
-      password: '123456'
+      password: '1234567'
     });
   };
 
@@ -47,8 +36,6 @@ const SignIn = () => {
             id="email"
             name="email"
             placeholder="E-mail"
-            value={email}
-            onChange={handleEmailChange}
             // required
           />
 
@@ -58,8 +45,6 @@ const SignIn = () => {
             type="password"
             name="password"
             placeholder="Password"
-            value={password}
-            onChange={handlePasswordChange}
             // required
           />
           <button
